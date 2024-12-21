@@ -52,7 +52,10 @@ class DiskInfoApp(QMainWindow):
         self.table_widget.setRowCount(len(disks))
         self.table_widget.setColumnCount(5)
         self.table_widget.setHorizontalHeaderLabels(["ID", "Model", "Type", "Partition", "Size"])
-        self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        # Enable interactive resizing for columns
+        header = self.table_widget.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Interactive)
 
         # Populate table
         for row, disk in enumerate(disks):
