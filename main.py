@@ -2,7 +2,11 @@ import os
 import sys
 import subprocess
 import ctypes
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QVBoxLayout, QWidget,
+    QTableWidget, QTableWidgetItem, QHeaderView, QAction, QMessageBox
+)
+import qdarkstyle
 
 
 class DiskInfoApp(QMainWindow):
@@ -10,6 +14,18 @@ class DiskInfoApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Disk Info Viewer")
         self.setGeometry(100, 100, 800, 600)
+
+        # Add menu for theme switching
+        menubar = self.menuBar()
+        theme_menu = menubar.addMenu("Theme")
+
+        light_action = QAction("Light Mode", self)
+        dark_action = QAction("Dark Mode", self)
+        theme_menu.addAction(light_action)
+        theme_menu.addAction(dark_action)
+
+        light_action.triggered.connect(self.apply_light_mode)
+        dark_action.triggered.connect(self.apply_dark_mode)
 
         # Main layout
         self.main_widget = QWidget(self)
@@ -45,7 +61,6 @@ class DiskInfoApp(QMainWindow):
             self.table_widget.setItem(row, 2, QTableWidgetItem(disk["type"]))
             self.table_widget.setItem(row, 3, QTableWidgetItem(disk["partition"]))
             self.table_widget.setItem(row, 4, QTableWidgetItem(disk["size"]))
-
 
     def get_disks(self):
         """
@@ -96,6 +111,28 @@ class DiskInfoApp(QMainWindow):
             print(f"Failed to fetch disks: {e}")
             return []
 
+    def show_error(self, message):
+        """
+        Display an error message to the user.
+        """
+        error_dialog = QMessageBox(self)
+        error_dialog.setIcon(QMessageBox.Critical)
+        error_dialog.setWindowTitle("Error")
+        error_dialog.setText(message)
+        error_dialog.exec_()
+
+    def apply_light_mode(self):
+        """
+        Switch to light mode.
+        """
+        app.setStyleSheet("")  # Default PyQt5 light mode
+
+    def apply_dark_mode(self):
+        """
+        Switch to dark mode using QDarkStyle.
+        """
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+
 
 def is_admin():
     """
@@ -127,5 +164,9 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = DiskInfoApp()
+
+    # Apply default dark mode
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+
     window.show()
     sys.exit(app.exec_())
